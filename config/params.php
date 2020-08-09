@@ -42,14 +42,16 @@ return [
             'default'     => 'default',
             'aliases'     => [],
             'databases'   => [
-                'default' => ['connection' => 'sqlite']
+                'default' => ['connection' => 'postgres']
             ],
             'connections' => [
-                'sqlite' => [
-                    'driver'     => \Spiral\Database\Driver\SQLite\SQLiteDriver::class,
-                    'connection' => 'sqlite:@runtime/database.db',
-                    'username'   => '',
-                    'password'   => '',
+                'postgres'  => [
+                    'driver'   => \Spiral\Database\Driver\Postgres\PostgresDriver::class,
+                    'options' => [
+                        'connection' => 'pgsql:host=127.0.0.1;dbname=postgres',
+                        'username'   => 'postgres',
+                        'password'   => 'password',
+                    ],
                 ],
             ],
             // 'query-logger' => \Yiisoft\Yii\Cycle\Logger\StdoutQueryLogger::class,
@@ -63,7 +65,7 @@ return [
         ],
         'schema-providers' => [
             \Yiisoft\Yii\Cycle\Schema\Provider\SimpleCacheSchemaProvider::class => [
-                'key' => 'cycle-orm-cache-key'
+                'key' => 'cycle-orm-cache-key2'
             ],
             // \Yiisoft\Yii\Cycle\Schema\Provider\FromFileSchemaProvider::class => [
             //     'file' => '@runtime/schema.php'
