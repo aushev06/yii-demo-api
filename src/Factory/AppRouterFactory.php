@@ -33,75 +33,20 @@ class AppRouterFactory
     {
         $routes = [
             // Lonely pages of site
-            Route::get('/', [SiteController::class, 'index'])
-                ->name('site/index'),
-            Route::methods([Method::GET, Method::POST], '/contact', [ContactController::class, 'contact'])
-                ->name('site/contact'),
-            Route::methods([Method::GET, Method::POST], '/login', [AuthController::class, 'login'])
-                ->name('site/login'),
-            Route::get('/logout', [AuthController::class, 'logout'])
-                ->name('site/logout'),
-            Route::methods([Method::GET, Method::POST], '/signup', [SignupController::class, 'signup'])
-                ->name('site/signup'),
-
-            // User
-            Group::create('/user', [
-                // Index
-                Route::get('[/page-{page:\d+}]', [UserController::class, 'index'])
-                    ->name('user/index'),
-                // Profile page
-                Route::get('/{login}', [UserController::class, 'profile'])
-                    ->name('user/profile'),
-            ]),
-
-            // User
-            Group::create('/api', [
-                Route::get('/info/v1', function (DataResponseFactoryInterface $responseFactory) {
-                    return $responseFactory->createResponse(['version' => '1.0', 'author' => 'yiisoft']);
-                })->name('api/info/v1'),
-                Route::get('/info/v2', ApiInfo::class)
+            Group::create('/v1', [
+                Route::post('/user', [ApiUserController::class, 'signUp'])
+                    ->addMiddleware(fn() => new \Tuupola\Middleware\CorsMiddleware([
+                        "origin"         => ["*"],
+                        "methods"        => ["GET", "POST", "PUT", "PATCH", "DELETE"],
+                        "headers.allow"  => [],
+                        "headers.expose" => [],
+                        "credentials"    => true,
+                        "cache"          => 0,
+                    ]))
                     ->addMiddleware(FormatDataResponseAsJson::class)
-                    ->name('api/info/v2'),
-                Route::get('/user', [ApiUserController::class, 'index'])
-                    ->name('api/user/index'),
-                Route::get('/user/{login}', [ApiUserController::class, 'profile'])
-                    ->addMiddleware(FormatDataResponseAsJson::class)
-                    ->name('api/user/profile'),
-            ])->addMiddleware(ApiDataWrapper::class)->addMiddleware(FormatDataResponseAsXml::class),
-
-            Group::create('/post', [
-                Route::get('[/page{page:\d+}]', [\App\V1\Post\PostController::class, 'index'])
-                    ->addMiddleware(FormatDataResponseAsJson::class)
-                    ->name('post/index')
-            ]),
-
-            // Blog routes
-            Group::create('/blog', [
-                // Index
-                Route::get('[/page{page:\d+}]', [BlogController::class, 'index'])
-                    ->name('blog/index'),
-                // Post page
-                Route::get('/page/{slug}', [PostController::class, 'index'])
-                    ->name('blog/post'),
-                // Tag page
-                Route::get('/tag/{label}[/page{page:\d+}]', [TagController::class, 'index'])
-                    ->name('blog/tag'),
-                // Archive
-                Group::create('/archive', [
-                    // Index page
-                    Route::get('', [ArchiveController::class, 'index'])
-                        ->name('blog/archive/index'),
-                    // Yearly page
-                    Route::get('/{year:\d+}', [ArchiveController::class, 'yearlyArchive'])
-                        ->name('blog/archive/year'),
-                    // Monthly page
-                    Route::get('/{year:\d+}-{month:\d+}[/page{page:\d+}]', [ArchiveController::class, 'monthlyArchive'])
-                        ->name('blog/archive/month')
-                ]),
-                // comments
-                Route::get('/comments/[next/{next}]', [CommentController::class, 'index'])
-                    ->name('blog/comment/index'),
-            ]),
+                    ->name('v1/api/user/create')
+            ])
+                ->addMiddleware(ApiDataWrapper::class),
         ];
 
         $collector = $container->get(RouteCollectorInterface::class);

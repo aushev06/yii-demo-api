@@ -24,7 +24,7 @@ final class MiddlewareDispatcherFactory
             ->addMiddleware($router)
             ->addMiddleware($subFolder)
             ->addMiddleware($session)
-            ->addMiddleware($csrf)
+//            ->addMiddleware($csrf)
             ->addMiddleware($errorCatcher);
     }
 }
